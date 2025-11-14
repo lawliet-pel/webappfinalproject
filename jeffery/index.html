@@ -24,7 +24,7 @@
       .sidebar {
         position: fixed;
         top: 20px;
-        left: 20px;
+        left: 45px;
         width: 280px;
         padding: 24px;
         border-radius: 24px;
@@ -45,6 +45,26 @@
       .feature-list {
         display: grid;
         gap: 12px;
+        max-height: 400px;
+        overflow-y: auto;
+        padding-right: 4px;
+      }
+
+      .feature-list::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .feature-list::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      .feature-list::-webkit-scrollbar-thumb {
+        background: #c2c2c2;
+        border-radius: 3px;
+      }
+
+      .feature-list::-webkit-scrollbar-thumb:hover {
+        background: #a0a0a0;
       }
 
       .feature-card {
@@ -109,12 +129,15 @@
 
       .content {
         margin-left: 340px;
-        padding: 40px;
+        margin-right: 80px;
+        padding: 20px 40px 40px 40px;
         flex: 1;
+        min-height: 100vh;
       }
 
       .content-card {
-        max-width: 720px;
+        width: 100%;
+        min-height: calc(100vh - 80px);
         padding: 28px;
         border-radius: 24px;
         background: #ffffff;
@@ -142,7 +165,8 @@
        }
 
        .ai-messages {
-         max-height: 320px;
+         max-height: calc(100vh - 400px);
+         min-height: 400px;
          overflow-y: auto;
          padding: 20px;
          border-radius: 18px;
@@ -215,6 +239,234 @@
          opacity: 0.9;
          transform: translateY(-1px);
        }
+
+      /* 漢堡選單樣式 */
+      .hamburger-menu {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+      }
+
+      .hamburger-button {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.92);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+        border: none;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 5px;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .hamburger-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 16px 35px rgba(0, 0, 0, 0.15);
+      }
+
+      .hamburger-button span {
+        width: 24px;
+        height: 3px;
+        background: #2f362f;
+        border-radius: 2px;
+        transition: all 0.3s ease;
+      }
+
+      .hamburger-button.active span:nth-child(1) {
+        transform: rotate(45deg) translate(7px, 7px);
+      }
+
+      .hamburger-button.active span:nth-child(2) {
+        opacity: 0;
+      }
+
+      .hamburger-button.active span:nth-child(3) {
+        transform: rotate(-45deg) translate(7px, -7px);
+      }
+
+      .menu-dropdown {
+        position: absolute;
+        top: 60px;
+        right: 0;
+        min-width: 200px;
+        padding: 12px 0;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.98);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: all 0.3s ease;
+      }
+
+      .menu-dropdown.active {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+
+      .menu-item {
+        padding: 14px 20px;
+        color: #2f362f;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        font-weight: 500;
+      }
+
+      .menu-item:hover {
+        background-color: #f0f0f0;
+      }
+
+      .menu-item:first-child {
+        border-top-left-radius: 16px;
+        border-top-right-radius: 16px;
+      }
+
+      .menu-item:last-child {
+        border-bottom-left-radius: 16px;
+        border-bottom-right-radius: 16px;
+      }
+
+      /* 預約介面樣式 */
+      .appointment-form {
+        margin-top: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .form-group label {
+        font-weight: bold;
+        color: #2f362f;
+      }
+
+      .form-group input,
+      .form-group select,
+      .form-group textarea {
+        padding: 12px;
+        border-radius: 12px;
+        border: 1px solid #c2c2c2;
+        font-family: inherit;
+        font-size: 14px;
+        transition: border-color 0.2s ease;
+      }
+
+      .form-group input:focus,
+      .form-group select:focus,
+      .form-group textarea:focus {
+        outline: none;
+        border-color: #8bd2c5;
+      }
+
+      .form-group textarea {
+        resize: vertical;
+        min-height: 100px;
+      }
+
+      .form-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+        margin-top: 8px;
+      }
+
+      .btn-primary {
+        padding: 12px 24px;
+        border-radius: 12px;
+        border: none;
+        background: linear-gradient(135deg, #71d2c0, #48b7ab);
+        color: #fff;
+        font-weight: bold;
+        cursor: pointer;
+        transition: transform 0.2s ease, opacity 0.2s ease;
+      }
+
+      .btn-primary:hover {
+        opacity: 0.9;
+        transform: translateY(-1px);
+      }
+
+      .btn-secondary {
+        padding: 12px 24px;
+        border-radius: 12px;
+        border: 1px solid #c2c2c2;
+        background: #fff;
+        color: #2f362f;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+      }
+
+      .btn-secondary:hover {
+        background-color: #f5f5f5;
+      }
+
+      /* 填寫症狀介面樣式 */
+      .symptom-form {
+        margin-top: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .symptom-category {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .symptom-category h3 {
+        margin: 0;
+        font-size: 18px;
+        color: #2f362f;
+        border-bottom: 2px solid #8bd2c5;
+        padding-bottom: 8px;
+      }
+
+      .checkbox-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .checkbox-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 16px;
+        border-radius: 12px;
+        border: 2px solid #d7f2ec;
+        background: #f9f9f9;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .checkbox-item:hover {
+        border-color: #8bd2c5;
+        background: #f0f9f7;
+      }
+
+      .checkbox-item input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+      }
+
+      .checkbox-item.checked {
+        border-color: #48b7ab;
+        background: #e8f5f3;
+      }
     </style>
   </head>
   <body>
@@ -231,7 +483,7 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <script type="text/babel">
-      const { useState } = React;
+      const { useState, useEffect, useRef } = React;
 
       const featureConfigs = [
         {
@@ -247,6 +499,12 @@
             "提供預約服務，讓使用者可以快速預約服務。",
         },
         {
+          id: "symptom",
+          title: "填寫症狀",
+          description:
+            "填寫您的症狀資訊，協助醫師更準確地進行診斷。",
+        },
+        {
           id: "support",
           title: "AI問診",
           description:
@@ -260,6 +518,24 @@
         const [lastMessage, setLastMessage] = useState("");
          const [conversation, setConversation] = useState([]);
          const [aiDraft, setAiDraft] = useState("");
+         const [menuOpen, setMenuOpen] = useState(false);
+         const menuRef = useRef(null);
+         // 預約表單狀態
+         const [appointmentForm, setAppointmentForm] = useState({
+           date: "",
+           time: "",
+           doctor: "",
+           department: "",
+           reason: "",
+         });
+         // 症狀表單狀態
+         const [symptomForm, setSymptomForm] = useState({
+           description: "",
+           duration: "",
+           severity: "",
+           symptoms: [],
+           additionalNotes: "",
+         });
 
         // 在左側浮動視窗內更新選擇狀態與輸入訊息
         const selectFeature = (feature) => {
@@ -302,6 +578,86 @@
            }, 600);
          };
 
+         // 處理漢堡選單開關
+         const toggleMenu = () => {
+           setMenuOpen(!menuOpen);
+         };
+
+         // 處理登入選項點擊
+         const handleLogin = () => {
+           alert("登入功能待實作");
+           setMenuOpen(false);
+         };
+
+         // 點擊外部關閉選單
+         useEffect(() => {
+           const handleClickOutside = (event) => {
+             if (menuRef.current && !menuRef.current.contains(event.target)) {
+               setMenuOpen(false);
+             }
+           };
+
+           if (menuOpen) {
+             document.addEventListener("mousedown", handleClickOutside);
+           }
+
+           return () => {
+             document.removeEventListener("mousedown", handleClickOutside);
+           };
+         }, [menuOpen]);
+
+         // 處理預約表單提交
+         const handleAppointmentSubmit = (e) => {
+           e.preventDefault();
+           alert("預約成功！預約資訊已送出。");
+           setAppointmentForm({
+             date: "",
+             time: "",
+             doctor: "",
+             department: "",
+             reason: "",
+           });
+         };
+
+         // 處理症狀表單提交
+         const handleSymptomSubmit = (e) => {
+           e.preventDefault();
+           alert("症狀資訊已提交！");
+           setSymptomForm({
+             description: "",
+             duration: "",
+             severity: "",
+             symptoms: [],
+             additionalNotes: "",
+           });
+         };
+
+         // 處理症狀選項切換
+         const toggleSymptom = (symptom) => {
+           setSymptomForm((prev) => {
+             const symptoms = prev.symptoms.includes(symptom)
+               ? prev.symptoms.filter((s) => s !== symptom)
+               : [...prev.symptoms, symptom];
+             return { ...prev, symptoms };
+           });
+         };
+
+         // 常見症狀選項
+         const commonSymptoms = [
+           "發燒",
+           "咳嗽",
+           "頭痛",
+           "喉嚨痛",
+           "流鼻水",
+           "肌肉痠痛",
+           "疲勞",
+           "噁心",
+           "腹瀉",
+           "呼吸困難",
+           "胸痛",
+           "頭暈",
+         ];
+
         return (
           <div className="app">
             <aside className="sidebar">
@@ -334,16 +690,233 @@
               </div>
             </aside>
 
+            {/* 漢堡選單 */}
+            <div className="hamburger-menu" ref={menuRef}>
+              <button
+                className={`hamburger-button ${menuOpen ? "active" : ""}`}
+                onClick={toggleMenu}
+                aria-label="選單"
+              >
+                <span></span>
+                <span></span>
+                <span></span>
+              </button>
+              <div className={`menu-dropdown ${menuOpen ? "active" : ""}`}>
+                <div className="menu-item" onClick={handleLogin}>
+                  登入
+                </div>
+              </div>
+            </div>
+
             <main className="content">
               <div className="content-card">
                 <h2>{activeFeature.title}</h2>
                 <p>{activeFeature.description}</p>
 
-                 {activeFeature.id !== "support" && lastMessage && (
+                {/* 服務介紹 */}
+                {activeFeature.id === "service" && lastMessage && (
                   <div className="message-preview">
                     <strong>最新留言：</strong>
                     <p>{lastMessage}</p>
                   </div>
+                )}
+
+                {/* 預約介面 */}
+                {activeFeature.id === "schedule" && (
+                  <form className="appointment-form" onSubmit={handleAppointmentSubmit}>
+                    <div className="form-group">
+                      <label htmlFor="appointment-date">選擇日期</label>
+                      <input
+                        type="date"
+                        id="appointment-date"
+                        value={appointmentForm.date}
+                        onChange={(e) =>
+                          setAppointmentForm({ ...appointmentForm, date: e.target.value })
+                        }
+                        required
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="appointment-time">選擇時間</label>
+                      <select
+                        id="appointment-time"
+                        value={appointmentForm.time}
+                        onChange={(e) =>
+                          setAppointmentForm({ ...appointmentForm, time: e.target.value })
+                        }
+                        required
+                      >
+                        <option value="">請選擇時間</option>
+                        <option value="09:00">09:00</option>
+                        <option value="10:00">10:00</option>
+                        <option value="11:00">11:00</option>
+                        <option value="14:00">14:00</option>
+                        <option value="15:00">15:00</option>
+                        <option value="16:00">16:00</option>
+                        <option value="17:00">17:00</option>
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="appointment-department">選擇科別</label>
+                      <select
+                        id="appointment-department"
+                        value={appointmentForm.department}
+                        onChange={(e) =>
+                          setAppointmentForm({ ...appointmentForm, department: e.target.value })
+                        }
+                        required
+                      >
+                        <option value="">請選擇科別</option>
+                        <option value="內科">內科</option>
+                        <option value="外科">外科</option>
+                        <option value="小兒科">小兒科</option>
+                        <option value="婦產科">婦產科</option>
+                        <option value="皮膚科">皮膚科</option>
+                        <option value="耳鼻喉科">耳鼻喉科</option>
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="appointment-doctor">選擇醫師</label>
+                      <select
+                        id="appointment-doctor"
+                        value={appointmentForm.doctor}
+                        onChange={(e) =>
+                          setAppointmentForm({ ...appointmentForm, doctor: e.target.value })
+                        }
+                        required
+                      >
+                        <option value="">請選擇醫師</option>
+                        <option value="王醫師">王醫師</option>
+                        <option value="李醫師">李醫師</option>
+                        <option value="張醫師">張醫師</option>
+                        <option value="陳醫師">陳醫師</option>
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="appointment-reason">預約原因</label>
+                      <textarea
+                        id="appointment-reason"
+                        placeholder="請簡述您的預約原因..."
+                        value={appointmentForm.reason}
+                        onChange={(e) =>
+                          setAppointmentForm({ ...appointmentForm, reason: e.target.value })
+                        }
+                      />
+                    </div>
+                    <div className="form-actions">
+                      <button type="button" className="btn-secondary" onClick={() => setAppointmentForm({
+                        date: "",
+                        time: "",
+                        doctor: "",
+                        department: "",
+                        reason: "",
+                      })}>
+                        清除
+                      </button>
+                      <button type="submit" className="btn-primary">
+                        確認預約
+                      </button>
+                    </div>
+                  </form>
+                )}
+
+                {/* 填寫症狀介面 */}
+                {activeFeature.id === "symptom" && (
+                  <form className="symptom-form" onSubmit={handleSymptomSubmit}>
+                    <div className="form-group">
+                      <label htmlFor="symptom-description">主要症狀描述</label>
+                      <textarea
+                        id="symptom-description"
+                        placeholder="請詳細描述您的主要症狀..."
+                        value={symptomForm.description}
+                        onChange={(e) =>
+                          setSymptomForm({ ...symptomForm, description: e.target.value })
+                        }
+                        required
+                      />
+                    </div>
+                    <div className="symptom-category">
+                      <h3>常見症狀（可複選）</h3>
+                      <div className="checkbox-group">
+                        {commonSymptoms.map((symptom) => (
+                          <div
+                            key={symptom}
+                            className={`checkbox-item ${
+                              symptomForm.symptoms.includes(symptom) ? "checked" : ""
+                            }`}
+                            onClick={() => toggleSymptom(symptom)}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={symptomForm.symptoms.includes(symptom)}
+                              onChange={() => toggleSymptom(symptom)}
+                            />
+                            <label>{symptom}</label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="symptom-duration">症狀持續時間</label>
+                      <select
+                        id="symptom-duration"
+                        value={symptomForm.duration}
+                        onChange={(e) =>
+                          setSymptomForm({ ...symptomForm, duration: e.target.value })
+                        }
+                        required
+                      >
+                        <option value="">請選擇持續時間</option>
+                        <option value="1天以內">1天以內</option>
+                        <option value="2-3天">2-3天</option>
+                        <option value="4-7天">4-7天</option>
+                        <option value="1-2週">1-2週</option>
+                        <option value="2週以上">2週以上</option>
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="symptom-severity">嚴重程度</label>
+                      <select
+                        id="symptom-severity"
+                        value={symptomForm.severity}
+                        onChange={(e) =>
+                          setSymptomForm({ ...symptomForm, severity: e.target.value })
+                        }
+                        required
+                      >
+                        <option value="">請選擇嚴重程度</option>
+                        <option value="輕微">輕微</option>
+                        <option value="中等">中等</option>
+                        <option value="嚴重">嚴重</option>
+                        <option value="非常嚴重">非常嚴重</option>
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="symptom-notes">其他補充說明</label>
+                      <textarea
+                        id="symptom-notes"
+                        placeholder="如有其他相關資訊，請在此補充..."
+                        value={symptomForm.additionalNotes}
+                        onChange={(e) =>
+                          setSymptomForm({ ...symptomForm, additionalNotes: e.target.value })
+                        }
+                      />
+                    </div>
+                    <div className="form-actions">
+                      <button type="button" className="btn-secondary" onClick={() => setSymptomForm({
+                        description: "",
+                        duration: "",
+                        severity: "",
+                        symptoms: [],
+                        additionalNotes: "",
+                      })}>
+                        清除
+                      </button>
+                      <button type="submit" className="btn-primary">
+                        提交症狀資訊
+                      </button>
+                    </div>
+                  </form>
                 )}
 
                  {activeFeature.id === "support" && (
@@ -388,4 +961,6 @@
     </script>
   </body>
 </html>
+
+
 
