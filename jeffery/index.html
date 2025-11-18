@@ -520,6 +520,8 @@
          const [aiDraft, setAiDraft] = useState("");
          const [menuOpen, setMenuOpen] = useState(false);
          const menuRef = useRef(null);
+         //AI判斷疾病
+         const [predictedDisease, setPredictedDisease] = useState("");
          // 預約表單狀態
          const [appointmentForm, setAppointmentForm] = useState({
            date: "",
@@ -552,31 +554,114 @@
         };
 
          // 處理 AI 問診右側對話框的訊息提交，預設回覆可替換為未來串接的 LLM 結果
-         const handleAiSend = () => {
-           if (!aiDraft.trim()) {
-             return;
-           }
+      const handleAiSend = async () => {
+        if (!aiDraft.trim()) {
+          return;
+        }
 
-           const input = aiDraft.trim();
+        const input = aiDraft.trim();
+        
+        //建立當前使用者物件
+        const userMessage = { role: "user", content: input };
 
-           // 紀錄使用者輸入
-           setConversation((prev) => [
-             ...prev,
-             { role: "user", content: input },
-           ]);
-           setAiDraft("");
+        //使用者的話顯示在畫面上
+        setConversation((prev) => [...prev, userMessage]);
+        setAiDraft("");
 
-           // 模擬 LLM 回應，後續可改為實際 API 呼叫
-           setTimeout(() => {
-             setConversation((prev) => [
-               ...prev,
-               {
-                 role: "assistant",
-                 content: `AI 預設回覆：感謝您的提問「${input}」，後端部署完成後會由真正的模型回覆。`,
-               },
-             ]);
-           }, 600);
-         };
+        try {
+          const GOOGLE_API_KEY = "AIzaSyCkGFAgJSYtELBMe7m5VlXVMBlI9ZOG620"; 
+          const API_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GOOGLE_API_KEY}`;
+
+          //System Prompt
+          const systemPrompt = `
+你現在是一個醫療問診專案的 AI 助手。
+請根據使用者的症狀描述與對話歷史，執行以下任務：
+
+1. 【判斷疾病】：推測可能的疾病名稱（若資訊不足可寫「待觀察」）。
+2. 【給予建議】：提供簡短的護理建議或就醫指引，如果你還未成功判斷出疾病，請不要給予建議，問使用者其他問題以達到判斷病因的目的。
+
+⚠️ 重要回覆格式規定：
+請務必使用 "###SEGMENT###" 符號將疾病名稱與建議分開。
+格式如下：
+[疾病名稱]###SEGMENT###[給使用者的親切建議]
+
+範例：
+感冒###SEGMENT###建議多喝溫開水，並多休息。
+
+使用者目前的輸入：
+`;
+
+          //歷史對話紀錄成prompt
+          const historyContents = conversation.map((msg) => ({
+            role: msg.role === "user" ? "user" : "model", // Gemini 稱 AI 為 'model'
+            parts: [{ text: msg.content }],
+          }));
+
+          //組合最終的 requestBody
+          const requestBody = {
+            contents: [
+              ...historyContents, 
+              {
+                role: "user",
+                parts: [
+                  {
+                    text: systemPrompt + input 
+                  }
+                ]
+              }
+            ]
+          };
+
+          const response = await fetch(API_ENDPOINT, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(requestBody) 
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`API 請求失敗: ${response.statusText} (${response.status}) - ${errorData.error.message}`);
+          }
+
+          const data = await response.json();
+          
+          if (!data.candidates || data.candidates.length === 0) {
+              throw new Error("API 回覆中沒有找到 'candidates'");
+          }
+          
+          // 取得完整回覆文字
+          const fullText = data.candidates[0]?.content?.parts[0]?.text || "";
+
+          //將疾病與建議分開
+          const parts = fullText.split("###SEGMENT###");
+          
+          let diseasePart = "判斷中...";
+          let advicePart = fullText; 
+
+          if (parts.length === 2) {
+            diseasePart = parts[0].trim();
+            advicePart = parts[1].trim();
+          }
+
+          console.log("AI 診斷疾病:", diseasePart);
+          setPredictedDisease(diseasePart);
+
+          const botMessage = {
+            role: "assistant",
+            content: advicePart,
+          };
+          
+          setConversation((prev) => [...prev, botMessage]);
+
+        } catch (error) {
+          console.error("API 呼叫失敗:", error);
+          const errorMessage = {
+            role: "assistant",
+            content: `抱歉，發生錯誤：${error.message}`
+          };
+          setConversation((prev) => [...prev, errorMessage]);
+        }
+      };
 
          // 處理漢堡選單開關
          const toggleMenu = () => {
