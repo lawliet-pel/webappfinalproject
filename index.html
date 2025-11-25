@@ -520,6 +520,7 @@
          const [aiDraft, setAiDraft] = useState("");
          const [menuOpen, setMenuOpen] = useState(false);
          const menuRef = useRef(null);
+         const [currentUser, setCurrentUser] = useState(null); // 用來存使用者資料
          //AI判斷疾病
          const [predictedDisease, setPredictedDisease] = useState("");
          // 預約表單狀態
@@ -668,11 +669,26 @@
            setMenuOpen(!menuOpen);
          };
 
-         // 處理登入選項點擊
-         const handleLogin = () => {
-           alert("登入功能待實作");
-           setMenuOpen(false);
-         };
+        // 處理登入 (模擬)
+        const handleLogin = () => {
+          // 使用瀏覽器內建的輸入框，模擬輸入帳號
+          const name = window.prompt("請輸入您的姓名以登入：", "使用者");
+          
+          if (name) {
+            // 如果有輸入名字，就設定為登入狀態
+            setCurrentUser({ name: name, id: Date.now() });
+            setMenuOpen(false); // 關閉選單
+            alert(`歡迎回來，${name}！`);
+          }
+        };
+
+        // 處理登出
+        const handleLogout = () => {
+          if (window.confirm("確定要登出系統嗎？")) {
+            setCurrentUser(null); // 清除使用者狀態
+            setMenuOpen(false);
+          }
+        };
 
          // 點擊外部關閉選單
          useEffect(() => {
@@ -787,9 +803,24 @@
                 <span></span>
               </button>
               <div className={`menu-dropdown ${menuOpen ? "active" : ""}`}>
-                <div className="menu-item" onClick={handleLogin}>
-                  登入
-                </div>
+                
+                {currentUser ? (
+                  /* 情況 A：如果有登入，顯示名字和登出按鈕 */
+                  <>
+                    <div className="menu-item" style={{cursor: 'default', color: '#2b8371', fontWeight: 'bold'}}>
+                      👤 {currentUser.name}
+                    </div>
+                    <div className="menu-item" onClick={handleLogout}>
+                      登出
+                    </div>
+                  </>
+                ) : (
+                  /* 情況 B：如果沒登入，顯示登入按鈕 */
+                  <div className="menu-item" onClick={handleLogin}>
+                    登入
+                  </div>
+                )}
+
               </div>
             </div>
 
@@ -1046,6 +1077,3 @@
     </script>
   </body>
 </html>
-
-
-
