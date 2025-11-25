@@ -650,6 +650,9 @@
            symptoms: [],
            additionalNotes: "",
          });
+         // 表單完成狀態（用於控制 AI 問診功能）
+         const [appointmentCompleted, setAppointmentCompleted] = useState(false);
+         const [symptomCompleted, setSymptomCompleted] = useState(false);
 
         // 在左側浮動視窗內更新選擇狀態與輸入訊息
         const selectFeature = (feature) => {
@@ -869,6 +872,7 @@
          const handleAppointmentSubmit = (e) => {
            e.preventDefault();
            alert("預約成功！預約資訊已送出。");
+           setAppointmentCompleted(true); // 標記預約表單已完成
            setAppointmentForm({
              date: "",
              time: "",
@@ -882,6 +886,7 @@
          const handleSymptomSubmit = (e) => {
            e.preventDefault();
            alert("症狀資訊已提交！");
+           setSymptomCompleted(true); // 標記症狀表單已完成
            setSymptomForm({
              description: "",
              duration: "",
@@ -1243,13 +1248,16 @@
                       />
                     </div>
                     <div className="form-actions">
-                      <button type="button" className="btn-secondary" onClick={() => setAppointmentForm({
-                        date: "",
-                        time: "",
-                        doctor: "",
-                        department: "",
-                        reason: "",
-                      })}>
+                      <button type="button" className="btn-secondary" onClick={() => {
+                        setAppointmentForm({
+                          date: "",
+                          time: "",
+                          doctor: "",
+                          department: "",
+                          reason: "",
+                        });
+                        setAppointmentCompleted(false); // 清除時重置完成狀態
+                      }}>
                         清除
                       </button>
                       <button type="submit" className="btn-primary">
@@ -1342,13 +1350,16 @@
                       />
                     </div>
                     <div className="form-actions">
-                      <button type="button" className="btn-secondary" onClick={() => setSymptomForm({
-                        description: "",
-                        duration: "",
-                        severity: "",
-                        symptoms: [],
-                        additionalNotes: "",
-                      })}>
+                      <button type="button" className="btn-secondary" onClick={() => {
+                        setSymptomForm({
+                          description: "",
+                          duration: "",
+                          severity: "",
+                          symptoms: [],
+                          additionalNotes: "",
+                        });
+                        setSymptomCompleted(false); // 清除時重置完成狀態
+                      }}>
                         清除
                       </button>
                       <button type="submit" className="btn-primary">
@@ -1360,34 +1371,67 @@
 
                  {activeFeature.id === "support" && (
                    <div className="ai-chat">
-                     <div className="ai-messages">
-                       {conversation.length === 0 ? (
-                         <div className="ai-bubble bot">
-                           歡迎使用 AI 問診示範介面，輸入訊息後可預覽未來模型的回覆流程。
-                         </div>
-                       ) : (
-                         conversation.map((message, index) => (
-                           <div
-                             key={`${message.role}-${index}`}
-                             className={`ai-bubble ${
-                               message.role === "user" ? "user" : "bot"
-                             }`}
-                           >
-                             {message.content}
+                     {/* 檢查表單是否都已完成 */}
+                     {!appointmentCompleted || !symptomCompleted ? (
+                       <div className="ai-messages">
+                         <div className="ai-bubble bot" style={{ 
+                           background: "#fff7e0", 
+                           border: "2px dashed #e7b86d",
+                           padding: "24px",
+                           textAlign: "left"
+                         }}>
+                           <strong style={{ display: "block", marginBottom: "12px", fontSize: "18px", color: "#8a641f" }}>
+                             請先完成必要表單
+                           </strong>
+                           <div style={{ color: "#666", lineHeight: "1.8" }}>
+                             {!appointmentCompleted && (
+                               <p style={{ margin: "8px 0" }}>
+                                 ❌ 尚未完成「預約」表單
+                               </p>
+                             )}
+                             {!symptomCompleted && (
+                               <p style={{ margin: "8px 0" }}>
+                                 ❌ 尚未完成「填寫症狀」表單
+                               </p>
+                             )}
+                             <p style={{ marginTop: "16px", fontSize: "14px" }}>
+                               請先前往左側功能表依序完成預約以及填寫症狀表單，完成後即可使用 AI 問診功能。
+                             </p>
                            </div>
-                         ))
-                       )}
-                     </div>
-                     <div className="ai-input">
-                       <textarea
-                         placeholder="描述症狀或提出問題..."
-                         value={aiDraft}
-                         onChange={(event) => setAiDraft(event.target.value)}
-                       />
-                       <button type="button" onClick={handleAiSend}>
-                         送出
-                       </button>
-                     </div>
+                         </div>
+                       </div>
+                     ) : (
+                       <>
+                         <div className="ai-messages">
+                           {conversation.length === 0 ? (
+                             <div className="ai-bubble bot">
+                               歡迎使用 AI 問診示範介面，輸入訊息後可預覽未來模型的回覆流程。
+                             </div>
+                           ) : (
+                             conversation.map((message, index) => (
+                               <div
+                                 key={`${message.role}-${index}`}
+                                 className={`ai-bubble ${
+                                   message.role === "user" ? "user" : "bot"
+                                 }`}
+                               >
+                                 {message.content}
+                               </div>
+                             ))
+                           )}
+                         </div>
+                         <div className="ai-input">
+                           <textarea
+                             placeholder="描述症狀或提出問題..."
+                             value={aiDraft}
+                             onChange={(event) => setAiDraft(event.target.value)}
+                           />
+                           <button type="button" onClick={handleAiSend}>
+                             送出
+                           </button>
+                         </div>
+                       </>
+                     )}
                    </div>
                  )}
               </div>
