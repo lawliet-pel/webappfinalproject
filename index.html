@@ -332,6 +332,102 @@
         border-bottom-right-radius: 16px;
       }
 
+      /* 登入彈窗樣式 */
+      .modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.35);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1200;
+        padding: 20px;
+      }
+
+      .modal-card {
+        width: 100%;
+        max-width: 420px;
+        background: #fffefd;
+        border-radius: 24px;
+        padding: 28px;
+        box-shadow: 0 24px 50px rgba(0, 0, 0, 0.18);
+        position: relative;
+      }
+
+      .modal-card h3 {
+        margin-top: 0;
+        margin-bottom: 4px;
+        font-size: 22px;
+      }
+
+      .modal-card p.lead {
+        margin-top: 0;
+        margin-bottom: 20px;
+        color: #666;
+        font-size: 14px;
+      }
+
+      .modal-close {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        width: 34px;
+        height: 34px;
+        border-radius: 999px;
+        border: none;
+        background: #f5f5f5;
+        cursor: pointer;
+        font-size: 18px;
+        line-height: 0;
+        transition: background 0.2s ease;
+      }
+
+      .modal-close:hover {
+        background: #ececec;
+      }
+
+      .modal-form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 16px;
+      }
+
+      .modal-form-group label {
+        font-weight: bold;
+        color: #2f362f;
+      }
+
+      .modal-form-group input {
+        padding: 12px;
+        border-radius: 12px;
+        border: 1px solid #c2c2c2;
+        font-size: 14px;
+        transition: border-color 0.2s ease;
+      }
+
+      .modal-form-group input:focus {
+        outline: none;
+        border-color: #8bd2c5;
+      }
+
+      .modal-status {
+        margin: 0 0 16px 0;
+        padding: 12px;
+        border-radius: 12px;
+        background: #fff7e0;
+        border: 1px dashed #e7b86d;
+        color: #8a641f;
+        font-size: 14px;
+      }
+
+      .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        margin-top: 12px;
+      }
+
       /* 預約介面樣式 */
       .appointment-form {
         margin-top: 24px;
@@ -520,7 +616,6 @@
          const [aiDraft, setAiDraft] = useState("");
          const [menuOpen, setMenuOpen] = useState(false);
          const menuRef = useRef(null);
-         const [currentUser, setCurrentUser] = useState(null); // 用來存使用者資料
          //AI判斷疾病
          const [predictedDisease, setPredictedDisease] = useState("");
          // 預約表單狀態
@@ -531,6 +626,22 @@
            department: "",
            reason: "",
          });
+         // 註冊彈窗狀態
+         const [registerModalOpen, setRegisterModalOpen] = useState(false);
+         const [registerForm, setRegisterForm] = useState({
+           name: "",
+           account: "",
+           password: "",
+           confirmPassword: "",
+         });
+         const [registerStatus, setRegisterStatus] = useState("");
+         // 登入彈窗狀態
+         const [loginModalOpen, setLoginModalOpen] = useState(false);
+         const [loginForm, setLoginForm] = useState({
+           account: "",
+           password: "",
+         });
+         const [loginStatus, setLoginStatus] = useState("");
          // 症狀表單狀態
          const [symptomForm, setSymptomForm] = useState({
            description: "",
@@ -669,26 +780,73 @@
            setMenuOpen(!menuOpen);
          };
 
-        // 處理登入 (模擬)
-        const handleLogin = () => {
-          // 使用瀏覽器內建的輸入框，模擬輸入帳號
-          const name = window.prompt("請輸入您的姓名以登入：", "使用者");
-          
-          if (name) {
-            // 如果有輸入名字，就設定為登入狀態
-            setCurrentUser({ name: name, id: Date.now() });
-            setMenuOpen(false); // 關閉選單
-            alert(`歡迎回來，${name}！`);
-          }
-        };
+         // 處理登入/註冊選項點擊（先顯示註冊視窗）
+         const handleLogin = () => {
+           setMenuOpen(false);
+           setRegisterStatus("");
+           setRegisterModalOpen(true);
+         };
 
-        // 處理登出
-        const handleLogout = () => {
-          if (window.confirm("確定要登出系統嗎？")) {
-            setCurrentUser(null); // 清除使用者狀態
-            setMenuOpen(false);
-          }
-        };
+         // 關閉註冊彈窗
+         const closeRegisterModal = () => {
+           setRegisterModalOpen(false);
+         };
+
+         // 關閉登入彈窗
+         const closeLoginModal = () => {
+           setLoginModalOpen(false);
+         };
+
+         // 從註冊視窗切換到登入視窗
+         const switchToLogin = () => {
+           setRegisterModalOpen(false);
+           setLoginStatus("");
+           setLoginModalOpen(true);
+         };
+
+         // 從登入視窗切換到註冊視窗
+         const switchToRegister = () => {
+           setLoginModalOpen(false);
+           setRegisterStatus("");
+           setRegisterModalOpen(true);
+         };
+
+         // 更新註冊欄位內容
+         const handleRegisterInputChange = (field, value) => {
+           setRegisterForm((prev) => ({ ...prev, [field]: value }));
+         };
+
+         // 更新登入欄位內容
+         const handleLoginInputChange = (field, value) => {
+           setLoginForm((prev) => ({ ...prev, [field]: value }));
+         };
+
+         // 暫存註冊資訊，等待未來串接後端
+         const handleRegisterSubmit = (event) => {
+           event.preventDefault();
+           if (!registerForm.name.trim() || !registerForm.account.trim() || !registerForm.password.trim() || !registerForm.confirmPassword.trim()) {
+             setRegisterStatus("請輸入完整註冊資訊。");
+             return;
+           }
+
+           if (registerForm.password !== registerForm.confirmPassword) {
+             setRegisterStatus("密碼與確認密碼不一致，請重新輸入。");
+             return;
+           }
+
+           setRegisterStatus("註冊資訊已暫存，後續串接後端時會正式送出。");
+         };
+
+         // 暫存登入資訊，等待未來串接後端
+         const handleLoginSubmit = (event) => {
+           event.preventDefault();
+           if (!loginForm.account.trim() || !loginForm.password.trim()) {
+             setLoginStatus("請輸入完整帳號與密碼。");
+             return;
+           }
+
+           setLoginStatus("登入資訊已暫存，後續串接後端時會正式送出。");
+         };
 
          // 點擊外部關閉選單
          useEffect(() => {
@@ -803,26 +961,191 @@
                 <span></span>
               </button>
               <div className={`menu-dropdown ${menuOpen ? "active" : ""}`}>
-                
-                {currentUser ? (
-                  /* 情況 A：如果有登入，顯示名字和登出按鈕 */
-                  <>
-                    <div className="menu-item" style={{cursor: 'default', color: '#2b8371', fontWeight: 'bold'}}>
-                      👤 {currentUser.name}
-                    </div>
-                    <div className="menu-item" onClick={handleLogout}>
-                      登出
-                    </div>
-                  </>
-                ) : (
-                  /* 情況 B：如果沒登入，顯示登入按鈕 */
-                  <div className="menu-item" onClick={handleLogin}>
-                    登入
-                  </div>
-                )}
-
+                <div className="menu-item" onClick={handleLogin}>
+                  登入/註冊
+                </div>
               </div>
             </div>
+
+            {/* 註冊彈窗 */}
+            {registerModalOpen && (
+              <div className="modal-backdrop" role="dialog" aria-modal="true">
+                <div className="modal-card">
+                  <button
+                    className="modal-close"
+                    aria-label="關閉註冊視窗"
+                    onClick={closeRegisterModal}
+                  >
+                    ×
+                  </button>
+                  <h3>註冊帳號</h3>
+                  <p className="lead">資料不會被用來進行非醫療看診以外之行為</p>
+                  <form onSubmit={handleRegisterSubmit}>
+                    <div className="modal-form-group">
+                      <label htmlFor="register-name">姓名</label>
+                      <input
+                        id="register-name"
+                        type="text"
+                        placeholder="請輸入姓名"
+                        value={registerForm.name}
+                        onChange={(event) =>
+                          handleRegisterInputChange("name", event.target.value)
+                        }
+                        required
+                      />
+                    </div>
+                    <div className="modal-form-group">
+                      <label htmlFor="register-account">帳號（Email）</label>
+                      <input
+                        id="register-account"
+                        type="email"
+                        placeholder="example@mail.com"
+                        value={registerForm.account}
+                        onChange={(event) =>
+                          handleRegisterInputChange("account", event.target.value)
+                        }
+                        required
+                      />
+                    </div>
+                    <div className="modal-form-group">
+                      <label htmlFor="register-password">密碼</label>
+                      <input
+                        id="register-password"
+                        type="password"
+                        placeholder="請輸入密碼"
+                        value={registerForm.password}
+                        onChange={(event) =>
+                          handleRegisterInputChange("password", event.target.value)
+                        }
+                        required
+                      />
+                    </div>
+                    <div className="modal-form-group">
+                      <label htmlFor="register-confirm-password">確認密碼</label>
+                      <input
+                        id="register-confirm-password"
+                        type="password"
+                        placeholder="請再次輸入密碼"
+                        value={registerForm.confirmPassword}
+                        onChange={(event) =>
+                          handleRegisterInputChange("confirmPassword", event.target.value)
+                        }
+                        required
+                      />
+                    </div>
+                    {registerStatus && <p className="modal-status">{registerStatus}</p>}
+                    <div className="modal-actions">
+                      <button
+                        type="button"
+                        className="btn-secondary"
+                        onClick={() => {
+                          setRegisterForm({ name: "", account: "", password: "", confirmPassword: "" });
+                          setRegisterStatus("");
+                        }}
+                      >
+                        清除
+                      </button>
+                      <button type="submit" className="btn-primary">
+                        暫存註冊資訊
+                      </button>
+                    </div>
+                    <div style={{ marginTop: "16px", textAlign: "center" }}>
+                      <button
+                        type="button"
+                        onClick={switchToLogin}
+                        style={{
+                          background: "none",
+                          border: "none",
+                          color: "#8bd2c5",
+                          cursor: "pointer",
+                          textDecoration: "underline",
+                          fontSize: "14px",
+                        }}
+                      >
+                        已有帳號？前往登入
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
+
+            {/* 登入彈窗 */}
+            {loginModalOpen && (
+              <div className="modal-backdrop" role="dialog" aria-modal="true">
+                <div className="modal-card">
+                  <button
+                    className="modal-close"
+                    aria-label="關閉登入視窗"
+                    onClick={closeLoginModal}
+                  >
+                    ×
+                  </button>
+                  <h3>登入帳號</h3>
+                  <p className="lead">資料不會被用來進行非醫療看診以外之行為</p>
+                  <form onSubmit={handleLoginSubmit}>
+                    <div className="modal-form-group">
+                      <label htmlFor="login-account">帳號（Email）</label>
+                      <input
+                        id="login-account"
+                        type="email"
+                        placeholder="example@mail.com"
+                        value={loginForm.account}
+                        onChange={(event) =>
+                          handleLoginInputChange("account", event.target.value)
+                        }
+                        required
+                      />
+                    </div>
+                    <div className="modal-form-group">
+                      <label htmlFor="login-password">密碼</label>
+                      <input
+                        id="login-password"
+                        type="password"
+                        placeholder="請輸入密碼"
+                        value={loginForm.password}
+                        onChange={(event) =>
+                          handleLoginInputChange("password", event.target.value)
+                        }
+                        required
+                      />
+                    </div>
+                    {loginStatus && <p className="modal-status">{loginStatus}</p>}
+                    <div className="modal-actions">
+                      <button
+                        type="button"
+                        className="btn-secondary"
+                        onClick={() => {
+                          setLoginForm({ account: "", password: "" });
+                          setLoginStatus("");
+                        }}
+                      >
+                        清除
+                      </button>
+                      <button type="submit" className="btn-primary">
+                        暫存登入資訊
+                      </button>
+                    </div>
+                    <div style={{ marginTop: "16px", textAlign: "center" }}>
+                      <button
+                        type="button"
+                        onClick={switchToRegister}
+                        style={{
+                          background: "none",
+                          border: "none",
+                          color: "#8bd2c5",
+                          cursor: "pointer",
+                          textDecoration: "underline",
+                          fontSize: "14px",
+                        }}
+                      >
+                        還沒有帳號？前往註冊
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
 
             <main className="content">
               <div className="content-card">
@@ -1077,3 +1400,6 @@
     </script>
   </body>
 </html>
+
+
+
