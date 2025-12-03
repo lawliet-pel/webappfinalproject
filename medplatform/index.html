@@ -754,6 +754,8 @@
            }
          });
          const [aiDraft, setAiDraft] = useState("");
+         // 對話是否已結束（用於控制是否可以繼續發送訊息）
+         const [chatEnded, setChatEnded] = useState(false);
          
          // 當對話更新時，同步到 localStorage
          useEffect(() => {
@@ -1444,7 +1446,7 @@
 
             // 2. 將所有症狀資訊送到後端，存到 SymptomLog 表
             const symptomResponse = await fetch(
-              `${API_BASE_URL}/api/appointment/symptoms`,
+              `${API_BASE_URL}/api/symptoms/`,
               {
                 method: "POST",
                 headers: {
@@ -1456,7 +1458,7 @@
                   duration: symptomForm.duration,
                   severity: symptomForm.severity,
                   symptoms: symptomForm.symptoms, // 複選症狀陣列
-                  additionalNotes: symptomForm.additionalNotes || "",
+                  notes: symptomForm.additionalNotes || "",
                 }),
               }
             );
@@ -2245,39 +2247,100 @@
                                </div>
                              ))
                            )}
+                           {chatEnded && (
+                             <div className="ai-bubble bot" style={{
+                               background: "#fff7e0",
+                               border: "2px dashed #e7b86d",
+                               alignSelf: "center",
+                               maxWidth: "90%",
+                               textAlign: "center"
+                             }}>
+                               <strong style={{ color: "#8a641f" }}>對話已結束</strong>
+                               <p style={{ margin: "8px 0 0 0", color: "#666" }}>
+                                 您已結束本次問診對話，後續將由醫師進行診斷。
+                               </p>
+                             </div>
+                           )}
                          </div>
-                         <div className="ai-input" 
-                           onKeyDown={(e) => {
-                             // 防止整個 div 區域的 Enter 鍵觸發表單提交
-                             if (e.key === "Enter" && e.target.tagName !== "TEXTAREA") {
-                               e.preventDefault();
-                             }
-                           }}
-                         >
-                           <textarea
-                             placeholder="描述症狀或提出問題..."
-                             value={aiDraft}
-                             onChange={(event) => setAiDraft(event.target.value)}
-                             onKeyDown={(event) => {
-                               // 按 Enter 鍵（不按 Shift）時送出訊息
-                               if (event.key === "Enter" && !event.shiftKey) {
-                                 event.preventDefault(); // 防止換行和表單提交
-                                 event.stopPropagation(); // 阻止事件冒泡
-                                 handleAiSend(event); // 送出訊息
+                         {!chatEnded ? (
+                           <div className="ai-input" 
+                             onKeyDown={(e) => {
+                               // 防止整個 div 區域的 Enter 鍵觸發表單提交
+                               if (e.key === "Enter" && e.target.tagName !== "TEXTAREA") {
+                                 e.preventDefault();
                                }
                              }}
-                           />
-                           <button 
-                             type="button" 
-                             onClick={(e) => {
-                               e.preventDefault(); // 防止任何預設行為
-                               e.stopPropagation(); // 阻止事件冒泡
-                               handleAiSend(e);
-                             }}
                            >
-                             送出
-                           </button>
-                         </div>
+                             <textarea
+                               placeholder="描述症狀或提出問題..."
+                               value={aiDraft}
+                               onChange={(event) => setAiDraft(event.target.value)}
+                               onKeyDown={(event) => {
+                                 // 按 Enter 鍵（不按 Shift）時送出訊息
+                                 if (event.key === "Enter" && !event.shiftKey) {
+                                   event.preventDefault(); // 防止換行和表單提交
+                                   event.stopPropagation(); // 阻止事件冒泡
+                                   handleAiSend(event); // 送出訊息
+                                 }
+                               }}
+                             />
+                             <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                               <button 
+                                 type="button" 
+                                 onClick={(e) => {
+                                   e.preventDefault(); // 防止任何預設行為
+                                   e.stopPropagation(); // 阻止事件冒泡
+                                   handleAiSend(e);
+                                 }}
+                               >
+                                 送出
+                               </button>
+                               <button 
+                                 type="button"
+                                 onClick={(e) => {
+                                   e.preventDefault();
+                                   e.stopPropagation();
+                                   if (window.confirm("確定要結束對話嗎？結束後將無法繼續發送訊息。")) {
+                                     setChatEnded(true);
+                                   }
+                                 }}
+                                 style={{
+                                   padding: "8px 16px",
+                                   borderRadius: "12px",
+                                   border: "2px solid #c2c2c2",
+                                   background: "#fff",
+                                   color: "#666",
+                                   fontWeight: "bold",
+                                   cursor: "pointer",
+                                   transition: "all 0.2s ease",
+                                   fontSize: "13px"
+                                 }}
+                                 onMouseEnter={(e) => {
+                                   e.target.style.background = "#f5f5f5";
+                                   e.target.style.borderColor = "#999";
+                                 }}
+                                 onMouseLeave={(e) => {
+                                   e.target.style.background = "#fff";
+                                   e.target.style.borderColor = "#c2c2c2";
+                                 }}
+                               >
+                                 結束對話
+                               </button>
+                             </div>
+                           </div>
+                         ) : (
+                           <div style={{
+                             padding: "14px",
+                             borderRadius: "16px",
+                             background: "#f5f5f5",
+                             textAlign: "center",
+                             color: "#666"
+                           }}>
+                             <p style={{ margin: 0 }}>
+                               對話已結束，無法繼續發送訊息
+                             </p>
+                           </div>
+                         )}
                        </>
                      );
                    })()}
@@ -2293,6 +2356,4 @@
     </script>
   </body>
 </html>
-
-
 
